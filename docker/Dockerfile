@@ -1,0 +1,36 @@
+FROM nvcr.io/nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04
+
+ENV PROJECT_DIR=/root/easyocr
+
+RUN set -x \
+    && apt update \
+    && apt upgrade -y
+
+RUN set -x \
+    && apt update \
+    && apt -y install locales \
+    && locale-gen ja_JP.UTF-8
+ENV LANG ja_JP.UTF-8
+ENV LANGUAGE ja_JP:ja
+ENV LC_ALL=ja_JP.UTF-8
+RUN localedef -f UTF-8 -i ja_JP ja_JP.utf8
+
+RUN set -x \
+    && apt -y install python3.8 python3.8-dev \
+    && ln -s /usr/bin/python3.8 /usr/bin/python \
+    && apt -y install wget python3-distutils \
+    && wget https://bootstrap.pypa.io/get-pip.py \
+    && python get-pip.py \
+    && python -m pip install --upgrade pip==24.0
+
+ENV TZ=Asia/Tokyo
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN mkdir -p ${PROJECT_DIR}
+COPY proc_latexocr.py ${PROJECT_DIR}
+COPY read_ndlocr_xml.py ${PROJECT_DIR}
+
+RUN set -x \
+    && pip install "pix2tex[gui]"
+
+WORKDIR ${PROJECT_DIR}
