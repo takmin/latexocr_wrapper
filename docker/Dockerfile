@@ -1,6 +1,6 @@
 FROM nvcr.io/nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04
 
-ENV PROJECT_DIR=/root/easyocr
+ENV PROJECT_DIR=/root/latexocr
 
 RUN set -x \
     && apt update \
