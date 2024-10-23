@@ -3,7 +3,7 @@
 ## 概要
 NDL OCRのWrapperツール(またはEasyOCR Wrapper)により出力されたレイアウト情報を読み取り、数式領域の文字認識を一括で行います。
 
-数式認識はLaTeX-OCR(https://github.com/lukas-blecher/LaTeX-OCR)を用います。
+数式認識は[LaTeX-OCR](https://github.com/lukas-blecher/LaTeX-OCR)を用います。
 
 
 ## ソフトウェア構成
@@ -24,6 +24,38 @@ git cloneでコードをダウンロードし、シェルスクリプト(dockerb
 $ git clone https://github.com/takmin/latexocr_wrapper.git
 $ cd latexocr_wrapper
 $ sh ./docker/dockerbuild.sh
+```
+
+
+### バグ修正版
+
+LaTeX-OCRの実行中に次のようなエラーが出る可能性がある。
+```
+ Traceback (most recent call last):
+  File "/root/latexocr/proc_latexocr.py", line 96, in <module>
+    recog_text_in_math(args.input, args.json, args.output)
+  File "/root/latexocr/proc_latexocr.py", line 81, in recog_text_in_math
+    block["LINES"] = latexocr(math_lines, img, 0.1)
+  File "/root/latexocr/proc_latexocr.py", line 44, in latexocr
+    copy_line["STRING"] = model(crop_img)
+  File "/usr/lib/python3.8/contextlib.py", line 75, in inner
+    return func(*args, **kwds)
+  File "/usr/local/lib/python3.8/dist-packages/pix2tex/cli.py", line 122, in __call__
+    img = pad(minmax_size(input_image.resize((w, h), Image.Resampling.BILINEAR if r > 1 else Image.Resampling.LANCZOS), self.args.max_dimensions, self.args.min_dimensions))
+  File "/usr/local/lib/python3.8/dist-packages/pix2tex/cli.py", line 47, in minmax_size
+    img = img.resize(size.astype(int), Image.BILINEAR)
+  File "/usr/local/lib/python3.8/dist-packages/PIL/Image.py", line 2297, in resize
+    if self.size == size and box == (0, 0) + self.size:
+ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+```
+
+このエラーは以下のISSUEにあたる。
+https://github.com/lukas-blecher/LaTeX-OCR/issues/392
+
+
+その場合、バグ修正版のdockerbuild-fix.shを使用する。（将来latexocrのアップデートによって修正された場合、この対応は不要になる）
+```
+$ sh ./docker/dockerbuild-fix.sh
 ```
 
 
